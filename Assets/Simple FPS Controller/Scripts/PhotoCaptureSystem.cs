@@ -1,0 +1,133 @@
+using UnityEngine;
+using UnityEngine.UI;
+using System.IO;
+using System.Collections;
+using System.Collections.Generic;
+
+public class PhotoCaptureSystem : MonoBehaviour
+{
+    [Header("Camera Settings")]
+    public Camera playerCamera;
+    public float detectionRange = 100f;
+    public string[] detectableTags;
+    public RenderTexture renderTexture;
+
+    [Header("Photo Settings")]
+    public string saveFolderName = "Photos";
+    public RawImage flashUI;
+    public float flashDuration = 0.2f;
+    public GameObject photoPrefab;
+    public Transform galleryPanel;
+    public GameObject gallery;
+
+    private int photoCount = 0;
+    private List<Texture2D> photoGallery = new List<Texture2D>();
+
+    void Start()
+    {
+        gallery.SetActive(false);
+    }
+    
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Mouse0))
+        {
+            StartCoroutine(TakePhotoRoutine());
+        }
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            if (gallery.activeSelf == false)
+                gallery.SetActive(true);
+            else
+            {
+               gallery.SetActive(false); 
+            }
+        }
+    }
+
+    IEnumerator TakePhotoRoutine()
+    {
+        string detectedTag = DetectObject(out float score);
+        yield return StartCoroutine(FlashScreen());
+
+        Texture2D photo = CapturePhoto();
+        SavePhoto(photo, detectedTag, score);
+        AddPhotoToGallery(photo);
+    }
+
+    string DetectObject(out float score)
+    {
+        Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+        RaycastHit hit;
+        score = 0f;
+
+        if (Physics.Raycast(ray, out hit, detectionRange))
+        {
+            foreach (string tag in detectableTags)
+            {
+                if (hit.collider.CompareTag(tag))
+                {
+                    // Score based on how centered the object is in view
+                    Vector3 viewPos = playerCamera.WorldToViewportPoint(hit.point);
+                    float distanceFromCenter = Vector2.Distance(new Vector2(0.5f, 0.5f), new Vector2(viewPos.x, viewPos.y));
+                    score = (1f - (distanceFromCenter*1000000)); // 1 = perfect center, 0 = far off
+                    return tag;
+                }
+            }
+            return "Unknown";
+        }
+        return "None";
+    }
+
+    IEnumerator FlashScreen()
+    {
+        if (flashUI != null)
+        {
+            flashUI.color = new Color(1, 1, 1, 1);
+            yield return new WaitForSeconds(flashDuration);
+            flashUI.color = new Color(1, 1, 1, 0);
+        }
+    }
+
+    Texture2D CapturePhoto()
+    {
+        RenderTexture currentRT = RenderTexture.active;
+        RenderTexture.active = renderTexture;
+
+        playerCamera.targetTexture = renderTexture;
+        playerCamera.Render();
+
+        Texture2D image = new Texture2D(renderTexture.width, renderTexture.height, TextureFormat.RGB24, false);
+        image.ReadPixels(new Rect(0, 0, renderTexture.width, renderTexture.height), 0, 0);
+        image.Apply();
+
+        playerCamera.targetTexture = null;
+        RenderTexture.active = currentRT;
+
+        return image;
+    }
+
+    void SavePhoto(Texture2D image, string detectedObject, float score)
+    {
+        byte[] bytes = image.EncodeToPNG();
+        string folderPath = Path.Combine(Application.dataPath, saveFolderName);
+        if (!Directory.Exists(folderPath)) Directory.CreateDirectory(folderPath);
+
+        string fileName = $"Photo_{photoCount}_{detectedObject}_Score{Mathf.RoundToInt(score * 100)}.png";
+        File.WriteAllBytes(Path.Combine(folderPath, fileName), bytes);
+        Debug.Log($" Saved {fileName} with score: {score * 100}%");
+
+        photoCount++;
+    }
+
+    void AddPhotoToGallery(Texture2D image)
+    {
+        photoGallery.Add(image);
+        if (photoPrefab != null && galleryPanel != null)
+        {
+            GameObject newPhoto = Instantiate(photoPrefab, galleryPanel);
+            newPhoto.GetComponent<RawImage>().texture = image;
+        }
+    }
+}
