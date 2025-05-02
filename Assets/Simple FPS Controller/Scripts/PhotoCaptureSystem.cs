@@ -53,7 +53,7 @@ public class PhotoCaptureSystem : MonoBehaviour
 
         Texture2D photo = CapturePhoto();
         SavePhoto(photo, detectedTag, score);
-        AddPhotoToGallery(photo);
+        AddPhotoToGallery(photo, score);
     }
 
     string DetectObject(out float score)
@@ -121,13 +121,17 @@ public class PhotoCaptureSystem : MonoBehaviour
         photoCount++;
     }
 
-    void AddPhotoToGallery(Texture2D image)
+    void AddPhotoToGallery(Texture2D image, float score)
     {
         photoGallery.Add(image);
         if (photoPrefab != null && galleryPanel != null)
         {
             GameObject newPhoto = Instantiate(photoPrefab, galleryPanel);
             newPhoto.GetComponent<RawImage>().texture = image;
+            GameObject newGO = new GameObject("myTextGO");
+            ngo.transform.SetParent(this.transform);
+            Text myText = AddComponent<Text>();
+            myText.text = score;
         }
     }
 }
