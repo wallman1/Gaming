@@ -20,6 +20,12 @@ public class PhotoCaptureSystem : MonoBehaviour
     public Transform galleryPanel;
     public GameObject gallery;
 
+    [Header("Gallery Pagination")]
+    public int photosPerPage = 6;
+
+    private int currentPage = 0;
+    private List<GameObject> galleryItems = new List<GameObject>();
+
     private int photoCount = 0;
     private List<Texture2D> photoGallery = new List<Texture2D>();
 
@@ -37,13 +43,25 @@ public class PhotoCaptureSystem : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.E))
         {
-            if (gallery.activeSelf == false)
-                gallery.SetActive(true);
-            else
+            gallery.SetActive(!gallery.activeSelf);
+            if (gallery.activeSelf)
             {
-               gallery.SetActive(false); 
+                RefreshGalleryView(); // Show correct page when opened
             }
+    }
+
+    // Only respond to page keys if gallery is open
+    if (gallery.activeSelf)
+    {
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+            NextPage();
         }
+        else if (Input.GetKeyDown(KeyCode.Z))
+        {
+            PreviousPage();
+        }
+    }
     }
 
     IEnumerator TakePhotoRoutine()
@@ -121,17 +139,50 @@ public class PhotoCaptureSystem : MonoBehaviour
         photoCount++;
     }
 
+    public void NextPage()
+    {
+        if ((currentPage + 1) * photosPerPage < galleryItems.Count)
+        {
+            currentPage++;
+            RefreshGalleryView();
+        }
+    }
+
+    public void PreviousPage()
+    {
+        if (currentPage > 0)
+        {
+            currentPage--;
+            RefreshGalleryView();
+        }
+    }
+
+    void RefreshGalleryView()
+    {
+        for (int i = 0; i < galleryItems.Count; i++)
+        {
+            bool isVisible = i >= currentPage * photosPerPage && i < (currentPage + 1) * photosPerPage;
+            galleryItems[i].SetActive(isVisible);
+        }
+    }
+
     void AddPhotoToGallery(Texture2D image, float score)
     {
-        photoGallery.Add(image);
-        if (photoPrefab != null && galleryPanel != null)
+    if (photoPrefab != null && galleryPanel != null)
+    {
+        GameObject newPhoto = Instantiate(photoPrefab);
+        newPhoto.transform.SetParent(galleryPanel, false);
+        newPhoto.GetComponent<RawImage>().texture = image;
+
+        Text scoreText = newPhoto.GetComponentInChildren<Text>();
+        if (scoreText != null)
         {
-            GameObject newPhoto = Instantiate(photoPrefab, galleryPanel);
-            newPhoto.GetComponent<RawImage>().texture = image;
-            GameObject newGO = new GameObject("myTextGO");
-            ngo.transform.SetParent(this.transform);
-            Text myText = AddComponent<Text>();
-            myText.text = score;
+            scoreText.text = $"Score: {Mathf.RoundToInt(score * 100)}%";
         }
+
+        galleryItems.Add(newPhoto);
+        RefreshGalleryView();
+    }
+
     }
 }

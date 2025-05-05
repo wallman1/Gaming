@@ -34,6 +34,7 @@ public class PlayerInteraction : MonoBehaviour
                 if (Input.GetKeyDown(interactKey))
                 {
                     currentInteractable.Interact();
+                    interactionPrompt.gameObject.SetActive(false);
                 }
 
                 return;
