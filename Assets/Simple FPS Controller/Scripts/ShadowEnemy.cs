@@ -30,6 +30,7 @@ public class ShadowEnemy : MonoBehaviour
 
     void Update()
     {
+    agent.SetDestination(player.position);
     // Handle visibility
     if (IsInDarkness())
     {
@@ -38,7 +39,6 @@ public class ShadowEnemy : MonoBehaviour
         // Attack and move only in darkness
         if (player != null)
         {
-            agent.SetDestination(player.position);
             TryAttack();
         }
     }
@@ -86,19 +86,19 @@ public class ShadowEnemy : MonoBehaviour
         // OPTIONAL: You could also toggle shadows or transparency here
     }
 
-    void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            Debug.Log("Player touched by enemy — instant death!");
+    //void OnTriggerEnter(Collider other)
+    //{
+     //   if (other.CompareTag("Player"))
+       // {
+         //   Debug.Log("Player touched by enemy — instant death!");
 
-            PlayerHealth playerHealth = other.GetComponent<PlayerHealth>();
-            if (playerHealth != null)
-            {
-                playerHealth.Kill();
-            }
-        }
-    }
+           // PlayerHealth playerHealth = other.GetComponent<PlayerHealth>();
+            //if (playerHealth != null)
+            //{
+              //  playerHealth.Kill();
+            //}
+        //}
+    //}
 
     void TryAttack()
     {
@@ -110,6 +110,8 @@ public class ShadowEnemy : MonoBehaviour
             if (hit.CompareTag("Player"))
             {
                 Debug.Log("Attacking player!");
+                PlayerHealth playerHealth = player.GetComponent<PlayerHealth>();
+                playerHealth.Kill();
                 lastAttackTime = Time.time;
                 // TODO: Implement health system here
             }
