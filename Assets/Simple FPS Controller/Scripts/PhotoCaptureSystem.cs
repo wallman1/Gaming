@@ -172,7 +172,11 @@ public class PhotoCaptureSystem : MonoBehaviour
     {
         GameObject newPhoto = Instantiate(photoPrefab);
         newPhoto.transform.SetParent(galleryPanel, false);
-        newPhoto.GetComponent<RawImage>().texture = image;
+        RawImage img = newPhoto.GetComponentInChildren<RawImage>();
+        if (img != null)
+            img.texture = image;
+        else
+            Debug.LogError("No RawImage found in photoPrefab!");
 
         Text scoreText = newPhoto.GetComponentInChildren<Text>();
         if (scoreText != null)
