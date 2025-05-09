@@ -89,7 +89,7 @@ public class PhotoCaptureSystem : MonoBehaviour
                     // Score based on how centered the object is in view
                     Vector3 viewPos = playerCamera.WorldToViewportPoint(hit.point);
                     float distanceFromCenter = Vector2.Distance(new Vector2(0.5f, 0.5f), new Vector2(viewPos.x, viewPos.y));
-                    score = (1f - (distanceFromCenter*1000000)); // 1 = perfect center, 0 = far off
+                    score = (1f - (distanceFromCenter*100000)); // 1 = perfect center, 0 = far off
                     return tag;
                 }
             }
