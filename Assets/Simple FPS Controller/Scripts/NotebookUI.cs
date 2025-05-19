@@ -14,6 +14,7 @@ public class NotebookUI : MonoBehaviour
     private bool isOpen = false;
     private int currentPage = 0;
     private string[] notebookPages;
+    private Notebook currentNotebook;
 
     void Awake()
     {
@@ -57,11 +58,12 @@ public class NotebookUI : MonoBehaviour
         }
     }
 
-        public void ShowNotebook(string[] pages)
+        public void ShowNotebook(string[] pages, Notebook sourceNotebook)
     {
         if (pages == null || pages.Length == 0) return;
 
         notebookPages = pages;
+        currentNotebook = sourceNotebook; // NEW: store reference
         currentPage = 0;
         notebookPanel.SetActive(true);
         isOpen = true;
@@ -70,10 +72,18 @@ public class NotebookUI : MonoBehaviour
     }
 
 
+
     public void HideNotebook()
     {
         notebookPanel.SetActive(false);
         isOpen = false;
         Time.timeScale = 1f;
+
+        if (currentNotebook != null)
+        {
+            currentNotebook.MarkAsRead();
+            currentNotebook = null;
+        }
     }
+
 }

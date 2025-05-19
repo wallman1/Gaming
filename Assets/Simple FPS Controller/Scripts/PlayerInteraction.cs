@@ -1,47 +1,41 @@
 using UnityEngine;
-using TMPro;
 
 public class PlayerInteraction : MonoBehaviour
 {
-    public float interactDistance = 3f;
-    public LayerMask interactLayer;
-    public KeyCode interactKey = KeyCode.Q;
+    public float interactRange = 3f;
+    public KeyCode interactKey = KeyCode.E;
+    public Camera playerCamera;
 
-    public TextMeshProUGUI interactionPrompt; // Reference to the UI prompt
-
-    private Camera cam;
-    private IInteractable currentInteractable;
-
-    void Start()
+    private void Update()
     {
-        cam = Camera.main;
-        interactionPrompt.gameObject.SetActive(false);
+        if (Input.GetKeyDown(interactKey))
+        {
+            TryInteract();
+        }
     }
 
-    void Update()
+    void TryInteract()
     {
-        Ray ray = new Ray(cam.transform.position, cam.transform.forward);
-
-        if (Physics.Raycast(ray, out RaycastHit hit, interactDistance, interactLayer))
+        if (playerCamera == null)
         {
-            IInteractable interactable = hit.collider.GetComponent<IInteractable>();
-
-            if (interactable != null)
-            {
-                currentInteractable = interactable;
-                interactionPrompt.gameObject.SetActive(true);
-
-                if (Input.GetKeyDown(interactKey))
-                {
-                    currentInteractable.Interact();
-                    interactionPrompt.gameObject.SetActive(false);
-                }
-
-                return;
-            }
+            Debug.LogWarning("PlayerInteractor: No camera assigned.");
+            return;
         }
 
-        currentInteractable = null;
-        interactionPrompt.gameObject.SetActive(false);
+        Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, interactRange))
+        {
+            IInteractable interactable = hit.collider.GetComponent<IInteractable>();
+            if (interactable != null)
+            {
+                interactable.Interact();
+            }
+            else
+            {
+                Debug.Log("Hit object is not interactable: " + hit.collider.name);
+            }
+        }
     }
 }

@@ -12,12 +12,25 @@ public class Notebook : MonoBehaviour, IInteractable
     public string Pg2;
     public string Pg3;
 
-    private string[] nah;
+    private bool hasBeenRead = false;
+    private string[] pages;
 
     public void Interact()
     {
-        // Initialize the page array just before showing the notebook
-        nah = new string[] { Pg1, Pg2, Pg3 };
-        NotebookUI.Instance.ShowNotebook(nah);
+        if (NotebookUI.Instance == null) return;
+
+        pages = new string[] { Pg1, Pg2, Pg3 };
+        NotebookUI.Instance.ShowNotebook(pages, this); // Pass itself to UI
+    }
+
+    public void MarkAsRead()
+    {
+        if (!hasBeenRead)
+        {
+            hasBeenRead = true;
+            FindObjectOfType<LevelProgression>()?.NotebookRead();
+            Debug.Log($"Notebook '{gameObject.name}' marked as read.");
+        }
     }
 }
+

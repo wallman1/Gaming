@@ -29,6 +29,8 @@ public class PhotoCaptureSystem : MonoBehaviour
     private int photoCount = 0;
     private List<Texture2D> photoGallery = new List<Texture2D>();
 
+    private List<float> photoScores = new List<float>();
+
     void Start()
     {
         gallery.SetActive(false);
@@ -168,25 +170,36 @@ public class PhotoCaptureSystem : MonoBehaviour
 
     void AddPhotoToGallery(Texture2D image, float score)
     {
-    if (photoPrefab != null && galleryPanel != null)
-    {
-        GameObject newPhoto = Instantiate(photoPrefab);
-        newPhoto.transform.SetParent(galleryPanel, false);
-        RawImage img = newPhoto.GetComponentInChildren<RawImage>();
-        if (img != null)
-            img.texture = image;
-        else
-            Debug.LogError("No RawImage found in photoPrefab!");
-
-        Text scoreText = newPhoto.GetComponentInChildren<Text>();
-        if (scoreText != null)
+        if (photoPrefab != null && galleryPanel != null)
         {
-            scoreText.text = $"Score: {Mathf.RoundToInt(score * 100)}%";
+            GameObject newPhoto = Instantiate(photoPrefab);
+            newPhoto.transform.SetParent(galleryPanel, false);
+            RawImage img = newPhoto.GetComponentInChildren<RawImage>();
+            if (img != null)
+                img.texture = image;
+            else
+                Debug.LogError("No RawImage found in photoPrefab!");
+
+            Text scoreText = newPhoto.GetComponentInChildren<Text>();
+            if (scoreText != null)
+            {
+                scoreText.text = $"Score: {Mathf.RoundToInt(score * 100)}%";
+            }
+
+            photoScores.Add(score); // Store score here
+            galleryItems.Add(newPhoto);
+            RefreshGalleryView();
         }
-
-        galleryItems.Add(newPhoto);
-        RefreshGalleryView();
     }
 
+    public float GetTotalScore()
+    {
+        float total = 0f;
+        foreach (float score in photoScores)
+        {
+            total += score;
+        }
+        return total;
     }
+
 }
