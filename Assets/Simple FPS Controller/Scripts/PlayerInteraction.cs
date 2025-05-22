@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class PlayerInteraction : MonoBehaviour
 {
-    public float interactRange = 3f;
-    public KeyCode interactKey = KeyCode.E;
+    public float interactRange = 20f;
+    public KeyCode interactKey = KeyCode.Q;
     public Camera playerCamera;
 
     private void Update()
