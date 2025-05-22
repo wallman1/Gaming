@@ -98,6 +98,9 @@ A few of Lovecraft's lines or quotations from his original books may be used in 
 **Wireframe 3 \-**  
 ![alt text](/Images/Screenshot%202025-05-22%20223254.png)
 
+**Gantt Chart**
+![alt text](/Images/Screenshot%202025-05-23%20064601.png)
+
 **HUD Wireframe Feedback**  
 The Heads-Up Display (HUD) is the most important aspect of the user interface (UI) for this project, and it must be executed correctly if one is to have an acceptable overall experience. Feedback collected with a Google Form distributed among the computing class indicated that most of the participants wished to see a health bar show the player's health. A considerable number of individuals also thought that more information would be shown on screen to help with gameplay. In a follow-up interview with another colleague, there was a suggestion that the health bar might be made more explicit—perhaps in numerical or percentage terms to inform the player more clearly about what they are doing. There was also an allusion to reducing the prominence of the crosshair so it does not break immersion. The idea of immersion was a thread that ran through the feedback. One of the participants mentioned that rather than having all the information presented on the screen in front of them, it would be more immersive to have it integrated into the game world. As an example, a notebook could be used to write down the days, and the wristwatch could show the time of day. These in-world objects would maintain the atmosphere but provide the player with the information they require.
 
